@@ -20,6 +20,7 @@ RUN apt-get update && \
     libfreesrp-dev \
     libgmp-dev \
     libhackrf-dev \
+    libsoapysdr-dev \
     libmirisdr-dev \
     liborc-0.4-dev \
     libpthread-stubs0-dev \
@@ -47,7 +48,7 @@ RUN git clone https://gitea.osmocom.org/sdr/gr-osmosdr /grosmosdr && \
   # autodetect (-march=native which we probably still don't want)
   # No PYTHON/SOAPY, make sure we have RTL and Airspy (but we should have much more)
   cmake -DUSE_SIMD="SSE2" -DUSE_SIMD_VALUES="SSE2" -DENABLE_PYTHON=OFF \
-  -DENABLE_RTL=ON -DENABLE_AIRSPY=ON -DENABLE_SOAPY=OFF .. && \
+  -DENABLE_RTL=ON -DENABLE_AIRSPY=ON .. && \
   make -j$(nproc) && \
   make install && \
   # We need to install both in / and /newroot to use in this image
@@ -70,7 +71,8 @@ WORKDIR /app
 RUN sed -i 's/^Components: main$/& contrib non-free/' /etc/apt/sources.list.d/debian.sources&& apt-get update && \
     apt-get -y upgrade && apt-get install --no-install-recommends -y ca-certificates gr-funcube gr-iqbal curl libboost-log1.74.0 \
     libboost-chrono1.74.0 libgnuradio-digital3.10.5 libgnuradio-analog3.10.5 libgnuradio-filter3.10.5 libgnuradio-network3.10.5  \
-    libgnuradio-uhd3.10.5 libairspyhf1 libfreesrp0 libxtrx0 libmirisdr0 libhackrf0 libbladerf2 libairspy0 sox fdkaac
+    libgnuradio-uhd3.10.5 libairspyhf1 libfreesrp0 libxtrx0 libmirisdr0 libhackrf0 libbladerf2 libairspy0 sox fdkaac \
+    libsoapysdr0.8 soapysdr0.8-module-all
 
 # Copy over gr-osmo, trunk-recorder and the rtlsdr deb from builder
 COPY --from=builder /newroot /
