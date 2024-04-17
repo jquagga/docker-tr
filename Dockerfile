@@ -1,6 +1,5 @@
-FROM ubuntu:22.04@sha256:1b8d8ff4777f36f19bfe73ee4df61e3a0b789caeff29caa019539ec7c9a57f95 AS builder
+FROM debian:12-slim@sha256:3d5df92588469a4c503adbead0e4129ef3f88e223954011c2169073897547cac AS builder
 
-# Install docker for passing the socket to allow for intercontainer exec
 RUN apt-get update && \
   apt-get -y upgrade &&\
   export DEBIAN_FRONTEND=noninteractive && \
@@ -32,11 +31,10 @@ RUN apt-get update && \
     pkg-config \
     python3-six
 
-# Compile librtlsdr-dev 2.0 for SDR-Blog v4 support and other updates
-# Ubuntu 22.04 LTS has librtlsdr 0.6.0
+# Compile librtlsdr-dev direct from osmocom for latest updates
 RUN cd /tmp && \
-  git clone https://github.com/steve-m/librtlsdr.git && \
-  cd librtlsdr && \
+  git clone https://gitea.osmocom.org/sdr/rtl-sdr.git && \
+  cd rtl-sdr && \
   mkdir build && \
   cd build && \
   cmake .. && \
@@ -75,10 +73,10 @@ WORKDIR /src/build
 RUN cmake .. && make -j$(nproc) && make DESTDIR=/newroot install
 
 #Stage 2 build
-FROM ubuntu:22.04@sha256:1b8d8ff4777f36f19bfe73ee4df61e3a0b789caeff29caa019539ec7c9a57f95
+FROM debian:12-slim@sha256:3d5df92588469a4c503adbead0e4129ef3f88e223954011c2169073897547cac
 RUN apt-get update && apt-get -y upgrade && apt-get install --no-install-recommends -y ca-certificates gr-funcube gr-iqbal curl libboost-log1.74.0 \
-    libboost-chrono1.74.0 libgnuradio-digital3.10.1 libgnuradio-analog3.10.1 libgnuradio-filter3.10.1 libgnuradio-network3.10.1  \
-    libgnuradio-uhd3.10.1 libsoapysdr0.8 soapysdr0.8-module-all libairspyhf1 libfreesrp0 libxtrx0 sox && \
+    libboost-chrono1.74.0 libgnuradio-digital3.10.5 libgnuradio-analog3.10.5 libgnuradio-filter3.10.5 libgnuradio-network3.10.5  \
+    libgnuradio-uhd3.10.5 libsoapysdr0.8 soapysdr0.8-module-all libairspyhf1 libfreesrp0 libxtrx0 sox && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /newroot /
