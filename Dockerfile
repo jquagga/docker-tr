@@ -52,12 +52,10 @@ RUN git clone https://gitea.osmocom.org/sdr/gr-osmosdr && \
   cd gr-osmosdr && \
   mkdir build && \
   cd build && \
-  # NONFREE is libsdrplay which we presently don't have included
-  # but leaving in case we ever do.
   # ATTENTION: We are also force-disabling AVX detection here as my system 
   # doesn't support it. Remove the two SIMD options to restore upstream 
   # autodetect (-march=native which we probably still don't want)
-  cmake -DENABLE_NONFREE=TRUE -DUSE_SIMD="SSE2" -DUSE_SIMD_VALUES="SSE2" .. && \
+  cmake -DUSE_SIMD="SSE2" -DUSE_SIMD_VALUES="SSE2" .. && \
   make -j$(nproc) && \
   make install && \
   # We need to install both in / and /newroot to use in this image
