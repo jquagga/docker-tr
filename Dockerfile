@@ -32,8 +32,8 @@ RUN apt-get update && \
     python3-six
 
 # Compile librtlsdr-dev direct from osmocom for latest updates
-RUN cd /tmp && \
-  git clone https://gitea.osmocom.org/sdr/rtl-sdr.git && \
+WORKDIR /rtlsdr
+RUN git clone https://gitea.osmocom.org/sdr/rtl-sdr.git && \
   cd rtl-sdr && \
   mkdir build && \
   cd build && \
@@ -43,33 +43,32 @@ RUN cd /tmp && \
   # We need to install both in / and /newroot to use in this image
   # and to copy over to the final image
   make DESTDIR=/newroot install && \
-  ldconfig && \
-  cd /tmp && \
-  rm -rf librtlsdr
+  ldconfig
 
-# Compile gr-osmosdr ourselves using a fork with various patches included
-RUN cd /tmp && \
-  git clone https://github.com/racerxdl/gr-osmosdr.git && \
+
+# Compile gr-osmosdr from upstream for latest updates
+WORKDIR /grosmosdr
+RUN git clone https://gitea.osmocom.org/sdr/gr-osmosdr && \
   cd gr-osmosdr && \
   mkdir build && \
   cd build && \
-  cmake -DENABLE_NONFREE=TRUE .. && \
+  # NONFREE is libsdrplay which we presently don't have included
+  # but leaving in case we ever do.
+  # ATTENTION: We are also force-disabling AVX detection here as my system 
+  # doesn't support it. Remove the two SIMD options to restore upstream 
+  # autodetect (-march=native which we probably still don't want)
+  cmake -DENABLE_NONFREE=TRUE -DUSE_SIMD="SSE2" -DUSE_SIMD_VALUES="SSE2" .. && \
   make -j$(nproc) && \
   make install && \
   # We need to install both in / and /newroot to use in this image
   # and to copy over to the final image
   make DESTDIR=/newroot install && \
-  ldconfig && \
-  cd /tmp && \
-  rm -rf gr-osmosdr
+  ldconfig 
 
-
+# Now let's build trunk-recorder
 WORKDIR /src
-
 RUN git clone https://github.com/robotastic/trunk-recorder /src
-
 WORKDIR /src/build
-
 RUN cmake .. && make -j$(nproc) && make DESTDIR=/newroot install
 
 #Stage 2 build
