@@ -1,0 +1,16 @@
+services:
+  recorder:
+    image: ghcr.io/jquagga/docker-tr:main 
+    container_name: trunk-recorder
+    init: true
+    devices:
+      - "/dev/bus/usb:/dev/bus/usb:rwm"
+    user: "1000"
+    volumes:
+      - ./media:/app/media
+      - ./config.json:/app/config.json:ro
+      - ./encode-upload.sh:/app/encode-upload.sh:ro
+      - $HOME/.volk/volk_config:$HOME/.volk/volk_config
+      - ./ChanList.csv:/app/ChanList.csv:ro
+      - ./UnitTags.csv:/app/UnitTags.csv
+    restart: unless-stopped
