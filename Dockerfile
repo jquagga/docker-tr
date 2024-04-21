@@ -10,25 +10,16 @@ RUN apt-get update && \
     curl \
     git \
     gnuradio-dev \
-    gr-funcube \
-    gr-iqbal \
     libairspy-dev \
-    libairspyhf-dev \
-    libbladerf-dev \
     libboost-all-dev \
     libcurl4-openssl-dev \
-    libfreesrp-dev \
     libgmp-dev \
-    libhackrf-dev \
-    libsoapysdr-dev \
-    libmirisdr-dev \
     liborc-0.4-dev \
     libpthread-stubs0-dev \
     libssl-dev \
     libuhd-dev \
     libusb-dev \
     libusb-1.0-0-dev \
-    libxtrx-dev \
     pkg-config \
     debhelper
 
@@ -58,7 +49,8 @@ RUN git clone https://gitea.osmocom.org/sdr/gr-osmosdr /grosmosdr && \
 
 # Now let's build trunk-recorder
 WORKDIR /src
-RUN git clone https://github.com/robotastic/trunk-recorder /src
+RUN git clone https://github.com/robotastic/trunk-recorder /src && \
+    git checkout 12a019c5d30e13c26844f0cea159247db3e785ee # Pin to a specific commit
 WORKDIR /src/build
 RUN cmake .. && make -j$(nproc) && make DESTDIR=/newroot install
 
@@ -69,10 +61,9 @@ FROM debian:12-slim@sha256:3d5df92588469a4c503adbead0e4129ef3f88e223954011c21690
 WORKDIR /app
 # Debian needs contrib and non-free for fdkaac so that's what this sed enables.
 RUN sed -i 's/^Components: main$/& contrib non-free/' /etc/apt/sources.list.d/debian.sources&& apt-get update && \
-    apt-get -y upgrade && apt-get install --no-install-recommends -y ca-certificates gr-funcube gr-iqbal curl libboost-log1.74.0 \
+    apt-get -y upgrade && apt-get install --no-install-recommends -y ca-certificates curl libboost-log1.74.0 \
     libboost-chrono1.74.0 libgnuradio-digital3.10.5 libgnuradio-analog3.10.5 libgnuradio-filter3.10.5 libgnuradio-network3.10.5  \
-    libgnuradio-uhd3.10.5 libairspyhf1 libfreesrp0 libxtrx0 libmirisdr0 libhackrf0 libbladerf2 libairspy0 sox fdkaac \
-    libsoapysdr0.8 soapysdr0.8-module-all libvolk2-bin
+    libgnuradio-uhd3.10.5 libairspy0 sox fdkaac
 
 # Copy over gr-osmo, trunk-recorder and the rtlsdr deb from builder
 COPY --from=builder /newroot /
