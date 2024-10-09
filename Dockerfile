@@ -54,7 +54,7 @@ RUN git clone https://gitea.osmocom.org/sdr/gr-osmosdr /grosmosdr && \
 # Now let's build trunk-recorder
 WORKDIR /src
 RUN git clone https://github.com/robotastic/trunk-recorder /src && \
-    git checkout 12a019c5d30e13c26844f0cea159247db3e785ee # Pin to a specific commit
+    git checkout 4d90da149e2fc39e5cbd2643bd50bbbc6f940415 # 5.0.1
 WORKDIR /src/build
 RUN cmake .. && make -j$(nproc) && make DESTDIR=/newroot install
 
