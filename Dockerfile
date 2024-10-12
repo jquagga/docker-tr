@@ -38,7 +38,7 @@ RUN git clone https://gitea.osmocom.org/sdr/gr-osmosdr /grosmosdr && \
   # doesn't support it. Remove the two SIMD options to restore upstream 
   # autodetect (-march=native which we probably still don't want)
   # Make sure we have RTL and Airspy and remove the rest
-  cmake -DUSE_SIMD="SSE2" -DUSE_SIMD_VALUES="SSE2" -DENABLE_PYTHON=OFF \
+  cmake -DENABLE_PYTHON=OFF \
   -DENABLE_RTL=ON -DENABLE_AIRSPY=ON -DENABLE_FCD=OFF \
   -DENABLE_FILE=OFF -DENABLE_UHD=OFF -DENABLE_MIRI=OFF \
   -DENABLE_HACKRF=OFF -DENABLE_BLADERF=OFF -DENABLE_RFSPACE=OFF \
