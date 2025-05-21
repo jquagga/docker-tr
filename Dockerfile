@@ -33,12 +33,11 @@ RUN dpkg -i --force-all ../*.deb && ldconfig
 # Compile gr-osmosdr from upstream for latest updates
 WORKDIR /grosmosdr
 RUN git clone https://gitea.osmocom.org/sdr/gr-osmosdr /grosmosdr && \
+  # Settle on haswell as a sensible build option herejj
+  sed -i 's/-march=native/-march=haswell/g' CMakeLists.txt && \
   mkdir build && cd build && \
-  # ATTENTION: We are also force-disabling AVX detection here as my system 
-  # doesn't support it. Remove the two SIMD options to restore upstream 
-  # autodetect (-march=native which we probably still don't want)
   # Make sure we have RTL and Airspy and remove the rest
-  cmake -DUSE_SIMD="SSE2" -DUSE_SIMD_VALUES="SSE2" -DENABLE_PYTHON=OFF \
+  cmake -DENABLE_PYTHON=OFF \
   -DENABLE_RTL=ON -DENABLE_AIRSPY=ON -DENABLE_FCD=OFF \
   -DENABLE_FILE=OFF -DENABLE_UHD=OFF -DENABLE_MIRI=OFF \
   -DENABLE_HACKRF=OFF -DENABLE_BLADERF=OFF -DENABLE_RFSPACE=OFF \
