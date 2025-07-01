@@ -1,4 +1,4 @@
-FROM debian:12-slim@sha256:e5865e6858dacc255bead044a7f2d0ad8c362433cfaa5acefb670c1edf54dfef AS builder
+FROM debian:12-slim@sha256:6ac2c08566499cc2415926653cf2ed7c3aedac445675a013cc09469c9e118fdd AS builder
 
 RUN apt-get update && \
   apt-get -y upgrade &&\
@@ -60,7 +60,7 @@ RUN cmake .. && make -j$(nproc) && make DESTDIR=/newroot install
 
 
 # Stage 2 build *****************************************************
-FROM debian:12-slim@sha256:e5865e6858dacc255bead044a7f2d0ad8c362433cfaa5acefb670c1edf54dfef
+FROM debian:12-slim@sha256:6ac2c08566499cc2415926653cf2ed7c3aedac445675a013cc09469c9e118fdd
 WORKDIR /app
 # Debian needs contrib and non-free for fdkaac so that's what this sed enables.
 # It's disabled though as I don't use it.
